@@ -9,6 +9,7 @@ const G = 6.674*(10**-11);
 
 //OTHER
 var fillbuffer, strokebuffer, strokeweightbuffer;
+let showinfo = true;
 
 function dTime(){
   return deltaTime/1000; 
@@ -76,7 +77,6 @@ class Body{
 }
 
 
-let showinfo = false;
 function forceBetween(bodyA, bodyB){
   return G * ( ( bodyA.mass * bodyB.mass ) / distanceBetween( bodyA , bodyB ) );
 }  
