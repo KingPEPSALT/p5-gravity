@@ -1,7 +1,7 @@
 //P5 JS CONSTANTS
 const FRAMERATE = 60;
-const CANVAS_X = 6000;
-const CANVAS_Y = 6000;
+const CANVAS_X = 600;
+const CANVAS_Y = 600;
 
 //PHYSICS CONSTANTS
 const G = 6.674*(10**-11);
@@ -93,8 +93,8 @@ function setup() {
   createCanvas(CANVAS_X, CANVAS_Y);
   frameRate(FRAMERATE);
   textFont('Courier New');
-  let b1 = new Body(createVector(3250, 3250), 1, 25, createVector(-15, -30));
-  let b2 = new Body(createVector(3000, 3000), 3000000000000, 25, createVector(10, -10), color(194,30,86));
+  let b1 = new Body(createVector(550, 550), 1, 25, createVector(-15, -30));
+  let b2 = new Body(createVector(300, 300), 3000000000000, 25, createVector(10, -10), color(194,30,86));
 }
 
 function draw() {
