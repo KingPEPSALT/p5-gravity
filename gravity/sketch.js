@@ -15,15 +15,29 @@ function dTime(){
   return deltaTime/1000; 
 }
 
+
+
+function forceBetween(bodyA, bodyB){
+  return G * ( ( bodyA.mass * bodyB.mass ) / distanceBetween( bodyA , bodyB ) );
+}  
+
+function distanceBetween(bodyA, bodyB){
+   return p5.Vector.mag(p5.Vector.sub(bodyA.position, bodyB.position));
+}
+
 var bodies = []
 class Body{
   
-  constructor(position, mass, diameter, velocity = createVector(0,0),  colour = color(100, 149, 237)){
+  constructor(position, mass, diameter, velocity, colour, name){
     this.position = position;
     this.mass = mass;
     this.velocity = velocity;
+    if(name === "SUN  "){
+      print(velocity.mag()); 
+    }
     this.radius = diameter/2;
-    this.colour = colour; // Cornflower blue
+    this.colour = colour;
+    this.name = name
     bodies.push(this);
   }
     
@@ -32,14 +46,15 @@ class Body{
     for(let body of bodies){
       let gAcceleration = p5.Vector.sub(body.position, this.position).setMag((forceBetween(this, body)/this.mass));
       this.velocity.add(gAcceleration);
+      if(this.name === "SUN  ") print(this.velocity.mag());
       accelerationsActing.push(gAcceleration);
     }
     this.position.add(this.trueVelocity());
     if(showinfo){
       for(let a of accelerationsActing){
-        if(a != undefined) drawArrow(this.position, p5.Vector.mult(a,10), color(0, 0, 255), this.radius);
+        if(a != undefined) drawArrow(this.position, a, color(0, 0, 255), this.radius);
       }
-      drawArrow(this.position, this.velocity, color(255, 0, 255), this.radius);
+      drawArrow(this.position, this.trueVelocity(), color(255, 0, 255), this.radius);
     }
 
   }
@@ -73,13 +88,6 @@ class Body{
 }
 
 
-function forceBetween(bodyA, bodyB){
-  return G * ( ( bodyA.mass * bodyB.mass ) / distanceBetween( bodyA , bodyB ) );
-}  
-
-function distanceBetween(bodyA, bodyB){
-   return p5.Vector.mag(p5.Vector.sub(bodyA.position, bodyB.position));
-}
   
 function setup() {
   fillbuffer = color(255, 255, 255);
@@ -90,9 +98,9 @@ function setup() {
   frameRate(FRAMERATE);
   textFont('Courier New');
   textSize(FONTSIZE);
-  let b1 = new Body(createVector(300, 1100), 4000000, 25, createVector(-50, -30));
-  let b2 = new Body(createVector(400, 800), 6000000000000, 90, createVector(10, -10), color(255,255,0));
-  let b3 = new Body(createVector(600, 1200),5000000, 40, createVector(50, -40), color(188, 42, 58));
+  let earth = new Body(createVector(300, 1100), 4000000, 25, createVector(-50, -30), color(0, 159, 225), "EARTH");
+  let sun = new Body(createVector(600, 600), 6000000000000, 90, createVector(0,0), color(255,255,0), "SUN  ");
+  let mars = new Body(createVector(800, 1200),5000000, 40, createVector(50, -40), color(188, 42, 58), "MARS ");
 
 }
 
@@ -107,7 +115,7 @@ function draw() {
   if(showinfo){
     noStroke();
     for(let body of bodies){
-      text('SPEED OF BODY ' + i + ': ' + body.speed().toFixed(2) + ' p/s', 20, 20+(i*FONTSIZE));
+      text('SPEED OF ' + body.name + ': ' + body.speed().toFixed(2) + ' p/s', 20, 20+(i*FONTSIZE));
       i++;
     }
     text('   ELAPSED TIME: ' + (millis()/1000).toFixed(0), 20, 20+(i*FONTSIZE));
@@ -121,7 +129,8 @@ function draw() {
 function drawArrow(base, vec, col, min) {
   push();
   let arrowSize = 7;
-  let arrowVec = vec;
+  let arrowVec = vec.copy();
+  arrowVec.mult(30);
   stroke(col);
   strokeWeight(3);
   fill(col);
