@@ -99,8 +99,8 @@ function setup() {
   frameRate(FRAMERATE);
   textFont('Courier New');
   textSize(FONTSIZE);
-  let b1 = new Body(createVector(900, 900), 1, 25, createVector(-50, -30));
-  let b2 = new Body(createVector(700, 550), 7000000000000, 90, createVector(10, -10), color(194,30,86));
+  let b1 = new Body(createVector(300, 1100), 1, 25, createVector(-50, -30));
+  let b2 = new Body(createVector(400, 800), 7000000000000, 90, createVector(10, -10), color(194,30,86));
 }
 
 function draw() {
