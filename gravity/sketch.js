@@ -1,7 +1,7 @@
 //P5 JS CONSTANTS
-const FRAMERATE = 60;
-const CANVAS_X = 600;
-const CANVAS_Y = 600;
+const FRAMERATE = 120;
+const CANVAS_X = 1200;
+const CANVAS_Y = 1200;
 
 //PHYSICS CONSTANTS
 const G = 6.674*(10**-11);
@@ -31,7 +31,10 @@ class Body{
     print(gVelocity.mag());
     this.velocity.add(gVelocity);
     this.position.add(this.trueVelocity());
-    drawArrow(this.position, gVelocity, color(255, 255, 255));
+    if(showinfo){
+      drawArrow(this.position, gVelocity, color(0, 0, 255));
+      drawArrow(this.position, this.velocity, color(255, 0, 255));
+    }
 
   }
   render(){
@@ -41,6 +44,7 @@ class Body{
     fill(fillbuffer);
     stroke(strokebuffer);
     strokeWeight(strokeweightbuffer);
+    
   }
   
   // PROPERTIES
@@ -93,8 +97,8 @@ function setup() {
   createCanvas(CANVAS_X, CANVAS_Y);
   frameRate(FRAMERATE);
   textFont('Courier New');
-  let b1 = new Body(createVector(550, 550), 1, 25, createVector(-15, -30));
-  let b2 = new Body(createVector(300, 300), 3000000000000, 25, createVector(10, -10), color(194,30,86));
+  let b1 = new Body(createVector(900, 900), 1, 25, createVector(-50, -30));
+  let b2 = new Body(createVector(700, 550), 7000000000000, 90, createVector(10, -10), color(194,30,86));
 }
 
 function draw() {
@@ -123,19 +127,20 @@ function draw() {
 }
 function drawArrow(base, vec, myColor) {
   push();
+  arrowVec = p5.Vector.mult(vec, 1);
   stroke(myColor);
   strokeWeight(3);
   fill(myColor);
   translate(base.x, base.y);
-  let x = vec.x;
-  let y = vec.y;
-  line(0, 0, x*100, y*100);
+  line(0, 0, arrowVec.x, arrowVec.y);
   rotate(vec.heading());
   let arrowSize = 7;
-  let mag = vec.mag();
-  translate(mag*100 - arrowSize, 0);
+  translate(arrowVec.mag() - arrowSize, 0);
   triangle(0, arrowSize / 2, 0, -arrowSize / 2, arrowSize, 0);
   pop();
+  fill(fillbuffer);
+  stroke(strokebuffer);
+  strokeWeight(strokeweightbuffer);
 }
 
 function keyPressed(){
