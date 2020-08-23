@@ -58,7 +58,7 @@ class Body{
       drawArrow(this.position, this.trueVelocity(), color(255, 0, 255), this.radius, this.mincutoff);
     }
     this.trail.push(this.position.copy());
-    if(this.trail.length > 2000) this.trail.shift();
+    if(this.trail.length > 400) this.trail.shift();
   }
   render(){
     fill(this.colour);
