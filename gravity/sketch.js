@@ -3,7 +3,7 @@ const FRAMERATE = 60;
 const CANVAS_X = 1200;
 const CANVAS_Y = 1200;
 const FONTSIZE = 20;
-let showinfo = true;
+let showinfo = false;
 
 //PHYSICS CONSTANTS
 const G = 6.674*(10**-11);
