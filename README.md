@@ -10,3 +10,5 @@ Although I'm not too sure of the orthodox and expected when working with physics
 These were then used to create a final equation where △v is only the magnitude of the velocity vector because acceleration in F=ma is not a vector. The vector however is simply the distance between the two bodies normalised.
 ![$\Delta V_x=\left(\Delta t\frac{G\frac{m_xm_y}{r}}{m_x}\right)\hat r}$](https://i.imgur.com/yjvIIYT.png)
 This can simply be added onto the velocity of any of the bodies and the resulting velocity vector will be formed.
+
+## [View on github pages](https://kingpepsalt.github.io/p5-gravity/gravity/)
