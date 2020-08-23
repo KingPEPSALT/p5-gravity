@@ -4,7 +4,7 @@ const CANVAS_X = 1200;
 const CANVAS_Y = 1200;
 const FONTSIZE = 20;
 let showinfo = false;
-
+let showtrails = false;
 //PHYSICS CONSTANTS
 const G = 6.674*(10**-11);
 
@@ -23,7 +23,7 @@ function distanceBetween(bodyA, bodyB){
    return p5.Vector.mag(p5.Vector.sub(bodyA.position, bodyB.position));
 }
 
-var bodies = []
+let bodies = []
 class Body{
   
   constructor(position, mass, diameter, velocity, colour, name, mincutoff = false){
@@ -37,6 +37,7 @@ class Body{
     this.colour = colour;
     this.name = name
     this.mincutoff = mincutoff;
+    this.trail = [];
     bodies.push(this);
   }
     
@@ -49,16 +50,21 @@ class Body{
       accelerationsActing.push(gAcceleration);
     }
     this.position.add(this.trueVelocity());
+
     if(showinfo){
       for(let a of accelerationsActing){
         if(a != undefined) drawArrow(this.position, a, color(0, 0, 255), this.radius);
       }
       drawArrow(this.position, this.trueVelocity(), color(255, 0, 255), this.radius, this.mincutoff);
     }
-
+    this.trail.push(this.position.copy());
+    if(this.trail.length > 2000) this.trail.shift();
   }
   render(){
     fill(this.colour);
+    stroke(this.colour);
+    strokeWeight(2);
+    if(showtrails) for(let t of this.trail) point(t.x, t.y);
     noStroke();
     ellipse(this.position.x, this.position.y, this.radius*2);
     fill(fillbuffer);
@@ -106,10 +112,10 @@ function draw() {
  
   fill(fillbuffer);
   background(0);
+  let i = 1;
   for(let body of bodies) body.update();
   for(let body of bodies) body.render();
   
-  let i = 1;
   if(showinfo){
     noStroke();
     for(let body of bodies){
@@ -122,7 +128,7 @@ function draw() {
     stroke(strokebuffer);
     strokeWeight(strokeweightbuffer);
   }
-  
+
 }
 function drawArrow(base, vec, col, min, mincutoff = false) {
   push();
@@ -150,5 +156,6 @@ function drawArrow(base, vec, col, min, mincutoff = false) {
 }
 
 function keyPressed(){
-  if(keyCode == 72) showinfo = !showinfo; 
+  if(keyCode == 72) showinfo = !showinfo;
+  if(keyCode == 84) showtrails = !showtrails;
 }
