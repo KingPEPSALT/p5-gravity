@@ -1,5 +1,5 @@
 //P5 JS CONSTANTS
-const FRAMERATE = 120;
+const FRAMERATE = 60;
 const CANVAS_X = 1200;
 const CANVAS_Y = 1200;
 const FONTSIZE = 20;
