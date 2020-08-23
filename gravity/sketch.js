@@ -28,11 +28,11 @@ class Body{
   update(other){
     
     let gVelocity = p5.Vector.sub(other.position, this.position).setMag(forceToDSpeed(this.force(other), this));
-    print(gVelocity.mag());
+    let gVelocityDraw = p5.Vector.mult(gVelocity, 20);
     this.velocity.add(gVelocity);
     this.position.add(this.trueVelocity());
     if(showinfo){
-      drawArrow(this.position, gVelocity, color(0, 0, 255));
+      drawArrow(this.position, gVelocityDraw, color(0, 0, 255));
       drawArrow(this.position, this.velocity, color(255, 0, 255));
     }
 
