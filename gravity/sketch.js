@@ -96,10 +96,10 @@ function setup() {
   frameRate(FRAMERATE);
   textFont('Courier New');
   textSize(FONTSIZE);
-  let earth = new Body(createVector(300, 1100), 4000000, 25, createVector(-50, -30), color(0, 159, 225), "EARTH");
+  let earth = new Body(createVector(300, 1100), 4000000, 25, createVector(-100, -30), color(0, 159, 225), "EARTH");
   let sun = new Body(createVector(600, 600), 6000000000000, 90, createVector(0,0), color(255,255,0), "SUN  ", true);
-  let mars = new Body(createVector(800, 1200),5000000, 40, createVector(50, -40), color(188, 42, 58), "MARS ");
-
+  let mars = new Body(createVector(800, 1200), 5000000, 40, createVector(50, -40), color(188, 42, 58), "MARS ");
+  let jack = new Body(createVector(400, 200), 7000000, 55, createVector(80, 30), color(105, 105, 105), "JACK ");  
 }
 
 function draw() {
