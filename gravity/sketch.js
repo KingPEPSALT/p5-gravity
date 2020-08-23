@@ -2,6 +2,7 @@
 const FRAMERATE = 120;
 const CANVAS_X = 1200;
 const CANVAS_Y = 1200;
+const FONTSIZE = 20;
 
 //PHYSICS CONSTANTS
 const G = 6.674*(10**-11);
@@ -97,7 +98,7 @@ function setup() {
   createCanvas(CANVAS_X, CANVAS_Y);
   frameRate(FRAMERATE);
   textFont('Courier New');
-  textSize(15);
+  textSize(FONTSIZE);
   let b1 = new Body(createVector(900, 900), 1, 25, createVector(-50, -30));
   let b2 = new Body(createVector(700, 550), 7000000000000, 90, createVector(10, -10), color(194,30,86));
 }
@@ -115,12 +116,12 @@ function draw() {
   if(showinfo){
     noStroke();
     for(let body of bodies){
-      text('SPEED OF BODY ' + i + ': ' + body.speed().toFixed(2) + ' p/s', 20, 20+(i*20));
+      text('SPEED OF BODY ' + i + ': ' + body.speed().toFixed(2) + ' p/s', 20, 20+(i*FONTSIZE));
       i++;
     }
-    text('   ELAPSED TIME: ' + (millis()/1000).toFixed(0), 20, 20+(i*20));
+    text('   ELAPSED TIME: ' + (millis()/1000).toFixed(0), 20, 20+(i*FONTSIZE));
     i++;
-    text('            FPS: ' + (dTime()**-1).toFixed(0), 20, 20+(i*20));
+    text('            FPS: ' + (dTime()**-1).toFixed(0), 20, 20+(i*FONTSIZE));
     stroke(strokebuffer);
     strokeWeight(strokeweightbuffer);
   }
