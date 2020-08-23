@@ -15,8 +15,6 @@ function dTime(){
   return deltaTime/1000; 
 }
 
-
-
 function forceBetween(bodyA, bodyB){
   return G * ( ( bodyA.mass * bodyB.mass ) / distanceBetween( bodyA , bodyB ) );
 }  
@@ -28,7 +26,7 @@ function distanceBetween(bodyA, bodyB){
 var bodies = []
 class Body{
   
-  constructor(position, mass, diameter, velocity, colour, name){
+  constructor(position, mass, diameter, velocity, colour, name, mincutoff = false){
     this.position = position;
     this.mass = mass;
     this.velocity = velocity;
@@ -38,6 +36,7 @@ class Body{
     this.radius = diameter/2;
     this.colour = colour;
     this.name = name
+    this.mincutoff = mincutoff;
     bodies.push(this);
   }
     
@@ -54,7 +53,7 @@ class Body{
       for(let a of accelerationsActing){
         if(a != undefined) drawArrow(this.position, a, color(0, 0, 255), this.radius);
       }
-      drawArrow(this.position, this.trueVelocity(), color(255, 0, 255), this.radius);
+      drawArrow(this.position, this.trueVelocity(), color(255, 0, 255), this.radius, this.mincutoff);
     }
 
   }
@@ -87,7 +86,6 @@ class Body{
   
 }
 
-
   
 function setup() {
   fillbuffer = color(255, 255, 255);
@@ -99,7 +97,7 @@ function setup() {
   textFont('Courier New');
   textSize(FONTSIZE);
   let earth = new Body(createVector(300, 1100), 4000000, 25, createVector(-50, -30), color(0, 159, 225), "EARTH");
-  let sun = new Body(createVector(600, 600), 6000000000000, 90, createVector(0,0), color(255,255,0), "SUN  ");
+  let sun = new Body(createVector(600, 600), 6000000000000, 90, createVector(0,0), color(255,255,0), "SUN  ", true);
   let mars = new Body(createVector(800, 1200),5000000, 40, createVector(50, -40), color(188, 42, 58), "MARS ");
 
 }
@@ -126,16 +124,21 @@ function draw() {
   }
   
 }
-function drawArrow(base, vec, col, min) {
+function drawArrow(base, vec, col, min, mincutoff = false) {
   push();
-  let arrowSize = 7;
+  let arrowSize = 10;
   let arrowVec = vec.copy();
   arrowVec.mult(30);
   stroke(col);
   strokeWeight(3);
   fill(col);
   translate(base.x, base.y);
-  if(arrowVec.mag() < (min+arrowSize)) arrowVec.setMag(min+arrowSize);
+
+  // minimum formatting work
+  let conditional = arrowVec.mag() < (min+arrowSize);
+  if(mincutoff) conditional = conditional && (arrowVec.mag() > 1);
+  if(conditional) arrowVec.setMag(min+arrowSize);
+
   line(0, 0, arrowVec.x, arrowVec.y);
   rotate(vec.heading());
   translate(arrowVec.mag() - arrowSize, 0);
@@ -148,5 +151,4 @@ function drawArrow(base, vec, col, min) {
 
 function keyPressed(){
   if(keyCode == 72) showinfo = !showinfo; 
-  
 }
