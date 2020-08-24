@@ -10,6 +10,7 @@ const G = 6.674*(10**-11);
 
 //OTHER
 var fillbuffer, strokebuffer, strokeweightbuffer;
+var trailPoints;
 
 function dTime(){
   return deltaTime/1000; 
@@ -57,8 +58,9 @@ class Body{
       }
       drawArrow(this.position, this.trueVelocity(), color(255, 0, 255), this.radius, this.mincutoff);
     }
-    this.trail.push(this.position.copy());
-    if(this.trail.length > 400) this.trail.shift();
+    if(!showtrails){ this.trail = []; trailPoints = 0; }
+    else {this.trail.push(this.position.copy()); trailPoints++;}
+    if(this.trail.length > 400){ this.trail.shift(); trailPoints--; }
   }
   render(){
     fill(this.colour);
@@ -97,15 +99,16 @@ function setup() {
   fillbuffer = color(255, 255, 255);
   strokebuffer = color(255, 255, 255);
   strokeweightbuffer = 4;
-  
+  trailPoints = 0;
   createCanvas(CANVAS_X, CANVAS_Y);
   frameRate(FRAMERATE);
   textFont('Courier New');
   textSize(FONTSIZE);
-  let earth = new Body(createVector(300, 1100), 4000000, 25, createVector(-100, -30), color(0, 159, 225), "EARTH");
-  let sun = new Body(createVector(600, 600), 6000000000000, 90, createVector(0,0), color(255,255,0), "SUN  ", true);
-  let mars = new Body(createVector(800, 1200), 5000000, 40, createVector(50, -40), color(188, 42, 58), "MARS ");
-  let jack = new Body(createVector(400, 200), 7000000, 55, createVector(80, 30), color(105, 105, 105), "JACK ");  
+  let earth = new Body(createVector(300, 1100), 4000000, 25, createVector(-100, -30), color(26, 188, 156), "EARTH");
+  let sun = new Body(createVector(600, 600), 6000000000000, 90, createVector(0,0), color(255,255,0), "SUN", true);
+  let mars = new Body(createVector(800, 1200), 5000000, 40, createVector(50, -40), color(188, 42, 58), "MARS");
+  let jack = new Body(createVector(400, 200), 7000000, 55, createVector(80, 30), color(105, 105, 105), "JACK");
+  let kashiyuka = new Body(createVector(200, 200), 6000000, 47, createVector(100, 20), color(0, 197, 255), "KASHIYUKA");
 }
 
 function draw() {
@@ -113,8 +116,7 @@ function draw() {
   fill(fillbuffer);
   background(0);
   let i = 1;
-  for(let body of bodies) body.update();
-  for(let body of bodies) body.render();
+  for(let body of bodies){ body.update(); body.render(); }
   
   if(showinfo){
     noStroke();
@@ -122,9 +124,14 @@ function draw() {
       text('SPEED OF ' + body.name + ': ' + body.speed().toFixed(2) + ' p/s', 20, 20+(i*FONTSIZE));
       i++;
     }
-    text('   ELAPSED TIME: ' + (millis()/1000).toFixed(0), 20, 20+(i*FONTSIZE));
+    text('ELAPSED TIME:' + (millis()/1000).toFixed(0), 20, 20+(i*FONTSIZE));
     i++;
-    text('            FPS: ' + (dTime()**-1).toFixed(0), 20, 20+(i*FONTSIZE));
+    text('FPS: ' + (dTime()**-1).toFixed(0), 20, 20+(i*FONTSIZE));
+    i++;
+    if(showtrails){
+      text('TRAIL POINTS: ' + trailPoints, 20, 20+(i*FONTSIZE));
+      i++;
+    }
     stroke(strokebuffer);
     strokeWeight(strokeweightbuffer);
   }
