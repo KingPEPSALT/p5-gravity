@@ -5,6 +5,7 @@ const CANVAS_Y = 1200;
 const FONTSIZE = 20;
 let showinfo = false;
 let showtrails = false;
+
 //PHYSICS CONSTANTS
 const G = 6.674*(10**-11);
 
