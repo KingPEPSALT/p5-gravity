@@ -13,8 +13,3 @@ These were then used to create a final equation where △v is only the magnitude
 This can simply be added onto the velocity of any of the bodies and the resulting velocity vector will be formed.
 
 ## [View on github pages](https://kingpepsalt.github.io/p5-gravity/gravity/)
-
-## TODO
-- Standardise units somehow; stop using pixels in the equations unless you use that everywhere
-- Allow for user interaction; slinging bodies with the mouse to create an interactive effect
-- Allow for user to change time and zoom; interactivity is the best.
