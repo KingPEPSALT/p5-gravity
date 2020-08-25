@@ -1,14 +1,13 @@
 //P5 JS CONSTANTS
 const FRAMERATE = 60;
-const CANVAS_X = 1200;
-const CANVAS_Y = 1200;
+//const CANVAS_X = windowWidth;
+//const CANVAS_Y = windowHeight;
 const FONTSIZE = 20;
 let showinfo = false;
 let showtrails = false;
 let creatingBody = false;
 //PHYSICS CONSTANTS
 const G = 6.674*(10**-11);
-
 //OTHER
 var fillbuffer, strokebuffer, strokeweightbuffer;
 var trailPoints;
@@ -115,7 +114,7 @@ function setup() {
   strokebuffer = color(255, 255, 255);
   strokeweightbuffer = 4;
   trailPoints = 0;
-  createCanvas(CANVAS_X, CANVAS_Y);
+  createCanvas(windowWidth, windowHeight);
   frameRate(FRAMERATE);
   textFont('Courier New');
   textSize(FONTSIZE);
