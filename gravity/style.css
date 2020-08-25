@@ -1,16 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@500&display=swap');
 html, body {
   margin: 0;
   padding: 0;
 }
 html {
-    overflow: scroll;
-    overflow-x: hidden;
+  overflow: scroll;
+  overflow-x: hidden;
 }
 ::-webkit-scrollbar {
-    width: 0px;  /* Remove scrollbar space */
-    background: transparent;  /* Optional: just make scrollbar invisible */
+  width: 0px;  /* Remove scrollbar space */
+  background: transparent;  /* Optional: just make scrollbar invisible */
 }
-
+p{
+  font-family: 'Ubuntu', sans-serif;
+  padding-left:20px;
+  padding-bottom:0;
+  padding-top:10px;
+}
+p:first-of-type{
+  padding-top:10px;
+}
+p:last-of-type{
+  padding-bottom:10px;
+}
 canvas {
   display: block;
 }

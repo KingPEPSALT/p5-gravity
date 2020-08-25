@@ -61,9 +61,9 @@ class Body{
     this.position.add(this.trueVelocity());
     if(showinfo){
       for(let a of accelerationsActing){
-        if(a != undefined) drawArrow(this.position, a, color(0, 0, 255), this.radius);
+        if(a != undefined) drawArrow(this.position, a, color(0, 0, 255), this.radius/2);
       }
-      drawArrow(this.position, this.trueVelocity(), color(255, 0, 255), this.radius, this.mincutoff);
+      drawArrow(this.position, this.trueVelocity(), color(255, 0, 255), this.radius/2, this.mincutoff);
     }
     if(!showtrails){ this.trail = []; trailPoints = 0; }
     else {this.trail.push(this.position.copy()); trailPoints++;}
@@ -202,6 +202,7 @@ function mousePressed(){
   for(let body of bodies){
     if(body.mouseInside()){
       if(mouseButton == RIGHT){
+        trailPoints -= body.trail.length;
         bodies.splice(bodies.indexOf(body), 1);
         deleted = true;
         break;
