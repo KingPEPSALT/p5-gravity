@@ -44,6 +44,7 @@ class Body{
     this.addedForce = [];
     
     bodies.push(this);
+    bodies.sort((a, b)=>b.mass-a.mass);
   }
     
   update(){
@@ -118,11 +119,7 @@ function setup() {
   frameRate(FRAMERATE);
   textFont('Courier New');
   textSize(FONTSIZE);
-  let earth = new Body(createVector(300, 1100), 4000000, 50, createVector(-100, -30), color(26, 188, 156), "EARTH");
-  let sun = new Body(createVector(600, 600), 6000000000000, 180, createVector(0,0), color(255,255,0), "SUN", true);
-  let mars = new Body(createVector(800, 1200), 5000000, 80, createVector(50, -40), color(188, 42, 58), "MARS");
-  let jack = new Body(createVector(400, 200), 7000000, 110, createVector(80, 30), color(105, 105, 105), "JACK");
-  let kashiyuka = new Body(createVector(200, 200), 6000000, 94, createVector(100, 20), color(0, 197, 255), "KASHIYUKA");
+ 
 }
 
 function draw() {
@@ -150,7 +147,7 @@ function draw() {
     strokeWeight(strokeweightbuffer);
   }
   if(creatingBody){
-    diameter += deltaTime;
+    diameter += deltaTime/4;
     fill(colour);
 
     ellipse(mouseX, mouseY, diameter/2);
@@ -168,7 +165,7 @@ function drawArrow(base, vec, col, min, mincutoff = false) {
   push();
   let arrowSize = 10;
   let arrowVec = vec.copy();
-  arrowVec.mult(30);
+  arrowVec.mult(20);
   stroke(col);
   strokeWeight(3);
   fill(col);
@@ -219,7 +216,7 @@ function mousePressed(){
 function mouseReleased(){
   creatingBody = false;
   
-  if(!selected) new Body(createVector(mouseX, mouseY), diameter*127272.727, diameter, createVector(0,0), colour, "CLICKED");
+  if(!selected) new Body(createVector(mouseX, mouseY), (diameter**2+15)*60000000, diameter, createVector(0,0), colour, "CLICKED");
   else {
     let dist = p5.Vector.mult(p5.Vector.sub(bodyActedUpon.position, createVector(mouseX, mouseY)));
     bodyActedUpon.addForce(p5.Vector.mult(dist, bodyActedUpon.mass/2));
