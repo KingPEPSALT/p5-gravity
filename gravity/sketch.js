@@ -195,31 +195,40 @@ var diameter;
 var colour;
 var bodyActedUpon;
 var selected;
+var deleted;
 function mousePressed(){
   selected = false;
+  deleted = false;
+
   for(let body of bodies){
     if(body.mouseInside()){
-      bodyActedUpon = body;
-      original = body.position.copy();
+      if(mouseButton == RIGHT){
+        bodies.splice(bodies.indexOf(body), 1);
+        deleted = true;
+        break;
+      }else if(mouseButton == LEFT){
+        bodyActedUpon = body;
+        original = body.position.copy();
+      }
       selected = true;
       break;
     }
   }
-  if(!creatingBody){
+  if(!creatingBody && mouseButton == LEFT){
     creatingBody = !selected;
     diameter = 0;
     colour = color(random(0, 255), random(0, 255), random(255));
   }
   
-  
 }
 function mouseReleased(){
   creatingBody = false;
   
-  if(!selected) new Body(createVector(mouseX, mouseY), (diameter**2+15)*60000000, diameter, createVector(0,0), colour, "CLICKED");
-  else {
+  if(!selected && mouseButton == LEFT && !deleted) new Body(createVector(mouseX, mouseY), (diameter**2+15  )*60000000, diameter, createVector(0,0), colour, "CLICKED");
+  else if(!deleted && mouseButton == LEFT){
     let dist = p5.Vector.mult(p5.Vector.sub(bodyActedUpon.position, createVector(mouseX, mouseY)));
     bodyActedUpon.addForce(p5.Vector.mult(dist, bodyActedUpon.mass/2));
   }
   selected = false;
+  deleted = false;
 }
