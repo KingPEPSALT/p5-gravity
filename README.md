@@ -1,5 +1,5 @@
 # p5-gravity
-![p5-gravity-logo.png](https://media.discordapp.net/attachments/508553890191507475/747957618517213194/unknown.png?width=689&height=677)
+![p5-gravity-logo.png](https://media.discordapp.net/attachments/508553890191507475/747957618517213194/unknown.png?width=689&height=677)\
 A gravity sandbox made in p5.js
 
 ## Explanation
