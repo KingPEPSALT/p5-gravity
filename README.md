@@ -14,3 +14,4 @@ This can simply be added onto the velocity of any of the bodies and the resultin
 
 ## [View on github pages](https://kingpepsalt.github.io/p5-gravity/gravity/)
 
+If you create lots of small planets and press H you're likely to crash, do the same with T and it'll crash or slow down your computer. Be warned.
