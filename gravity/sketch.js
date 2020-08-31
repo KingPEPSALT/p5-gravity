@@ -17,7 +17,7 @@ function dTime(){
 }
 
 function forceBetween(bodyA, bodyB){
-  return G * ( ( bodyA.mass * bodyB.mass ) / distanceBetween( bodyA.position , bodyB.position ) );
+  return G * ( ( bodyA.mass * bodyB.mass ) / distanceBetween( bodyA.position , bodyB.position )**2 );
 }  
 
 function distanceBetween(veca, vecb){
@@ -43,7 +43,7 @@ class Body{
     this.addedForce = [];
     
     bodies.push(this);
-    bodies.sort((a, b)=>b.mass-a.mass);
+    bodies.sort((a, b)=>b.mass-a.mass); // will be removed when collision detection added
   }
     
   update(){
@@ -73,7 +73,15 @@ class Body{
     fill(this.colour);
     stroke(this.colour);
     strokeWeight(2);
-    if(showtrails) for(let t of this.trail) point(t.x, t.y);
+    let i = 0;
+    if(showtrails) for(let t of this.trail){
+      colorMode(HSB, 100);
+      stroke(i%100, 100, 100);
+      strokeWeight(5);
+      i++;
+      point(t.x, t.y);
+    } 
+    colorMode(RGB, 255);
     strokeWeight(7);
     stroke(color(255));
     if(!this.mouseInside()) noStroke();
@@ -108,13 +116,12 @@ class Body{
   
 }
 
-  
 function setup() {
   fillbuffer = color(255, 255, 255);
   strokebuffer = color(255, 255, 255);
   strokeweightbuffer = 4;
   trailPoints = 0;
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(windowWidth*6, windowHeight*6);
   frameRate(FRAMERATE);
   textFont('Courier New');
   textSize(FONTSIZE);
@@ -126,7 +133,8 @@ function draw() {
   fill(fillbuffer);
   background(0);
   let i = 1;
-  for(let body of bodies){ body.update(); body.render(); }
+  for(let body of bodies) body.update();
+  for(let body of bodies) body.render();
   
   if(showinfo){
     noStroke();
@@ -224,7 +232,7 @@ function mousePressed(){
 function mouseReleased(){
   creatingBody = false;
   
-  if(!selected && mouseButton == LEFT && !deleted) new Body(createVector(mouseX, mouseY), (diameter**2+15  )*60000000, diameter, createVector(0,0), colour, "CLICKED");
+  if(!selected && mouseButton == LEFT && !deleted) new Body(createVector(mouseX, mouseY), (diameter**2+15  )*9000000000, diameter, createVector(0,0), colour, "CLICKED");
   else if(!deleted && mouseButton == LEFT){
     let dist = p5.Vector.mult(p5.Vector.sub(bodyActedUpon.position, createVector(mouseX, mouseY)));
     bodyActedUpon.addForce(p5.Vector.mult(dist, bodyActedUpon.mass/2));
