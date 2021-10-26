@@ -1,16 +1,16 @@
 //P5 JS CONSTANTS
 const FRAMERATE = 60;
-//const CANVAS_X = windowWidth;
-//const CANVAS_Y = windowHeight;
 const FONTSIZE = 20;
-let showinfo = false;
-let showtrails = false;
-let creatingBody = false;
+const TRAIL_LENGTH_CAP = 500;
+
+let show_info_mode = false;
+let show_trail_mode = false;
+let body_being_generated = false;
 //PHYSICS CONSTANTS
 const G = 6.674*(10**-11);
 //OTHER
-var fillbuffer, strokebuffer, strokeweightbuffer;
-var trailPoints;
+var default_fill, default_stroke, default_stroke_weight;
+var total_trail_particles;
 
 function dTime(){
   return deltaTime/1000; 
@@ -18,110 +18,110 @@ function dTime(){
 
 function forceBetween(bodyA, bodyB){
   return G * ( ( bodyA.mass * bodyB.mass ) / distanceBetween( bodyA.position , bodyB.position )**2 );
-}  
 
+}  
+function directionTo(bodyA, bodyB){
+  return p5.Vector.sub(bodyB.position, bodyA.position).normalize();
+}
 function distanceBetween(veca, vecb){
    return p5.Vector.mag(p5.Vector.sub(veca, vecb));
 }
 
 let bodies = []
+
 class Body{
   
-  constructor(position, mass, diameter, velocity, colour, name, mincutoff = false){
+  constructor(position, mass, radius, velocity, colour, name, mincutoff = false){
     this.position = position;
     this.mass = mass;
     this.velocity = velocity;
-    if(name === "SUN  "){
-      print(velocity.mag()); 
-    }
-    this.radius = diameter/2;
+    this.radius = radius;
     this.colour = colour;
     this.name = name
     this.mincutoff = mincutoff;
     this.trail = [];
     this.selected = false;
-    this.addedForce = [];
-    
+    this.acting_forces = [];
     bodies.push(this);
-    bodies.sort((a, b)=>b.mass-a.mass); // will be removed when collision detection added
+    bodies.sort((a, b)=>b.mass-a.mass); // will be removed if collision detection added
   }
-    
+  
+  apply_force(vector_force){
+    this.velocity.add(p5.Vector.div(vector_force, this.mass)); 
+  }
+  update_position(){
+    this.position.add(this.deltaTimeVelocity());
+  }
   update(){
-    let accelerationsActing = [];
-    let resultantAdded = createVector(0,0);
-    for(let accel of this.addedForce) resultantAdded.add(accel);
-    this.addedForce = [];
+    let resultant_force = createVector(0,0);
     for(let body of bodies){
-      let gAcceleration = p5.Vector.sub(body.position, this.position).setMag((forceBetween(this, body)/this.mass));
-      this.velocity.add(gAcceleration);
-      if(this.name === "SUN  ") print(this.velocity.mag());
-      accelerationsActing.push(gAcceleration);
+      if(body == this) continue;
+      let gravitational_force = p5.Vector.mult(directionTo(this, body), forceBetween(body, this));
+      this.acting_forces.push(gravitational_force)
+      resultant_force.add(gravitational_force);
     }
-    this.velocity.add(resultantAdded);
-    this.position.add(this.trueVelocity());
-    if(showinfo){
-      for(let a of accelerationsActing){
-        if(a != undefined) drawArrow(this.position, a, color(0, 0, 255), this.radius/2);
-      }
-      drawArrow(this.position, this.trueVelocity(), color(255, 0, 255), this.radius/2, this.mincutoff);
-    }
-    if(!showtrails){ this.trail = []; trailPoints = 0; }
-    else {this.trail.push(this.position.copy()); trailPoints++;}
-    if(this.trail.length > 400){ this.trail.shift(); trailPoints--; }
+    // reduced divisions from n^2 to n (approx factor of n) per frame as acceleration is calculated once per body per frame rather than n times per body per frame
+    this.velocity.add(p5.Vector.div(resultant_force,this.mass));
+    this.update_position();
+
+    this.acting_forces = [];
+
+    if(!show_trail_mode) { this.trail = []; total_trail_particles = 0; } // delete trail if trail exists
+    else {this.trail.push(this.position.copy()); total_trail_particles++;} // add position to trail history
+    if(this.trail.length > TRAIL_LENGTH_CAP){ this.trail.pop(); total_trail_particles--; } // remove excess trail
+
   }
   render(){
-    fill(this.colour);
     stroke(this.colour);
     strokeWeight(2);
     let i = 0;
-    if(showtrails) for(let t of this.trail){
+    if(show_trail_mode) for(let pos of this.trail){
       colorMode(HSB, 100);
-      stroke(i%100, 100, 100);
+      stroke((i++)%100, 100, 100); //rainbow effect
       strokeWeight(5);
-      i++;
-      point(t.x, t.y);
+      point(pos.x, pos.y);
     } 
+    // draw force arrows
+    if(show_info_mode){
+      for(let force of this.acting_forces)
+        if(force != undefined) drawArrow(this.position, force, color(0, 0, 255), this.radius/2);
+      drawArrow(this.position, this.deltaTimeVelocity(), color(255, 0, 255), this.radius/2, this.mincutoff);
+    }
     colorMode(RGB, 255);
+    fill(this.colour);
+
     strokeWeight(7);
     stroke(color(255));
-    if(!this.mouseInside()) noStroke();
-    ellipse(this.position.x, this.position.y, this.radius);
-    fill(fillbuffer);
-    stroke(strokebuffer);
-    strokeWeight(strokeweightbuffer);
+
+    if(!this.isMouseInside()) noStroke();
+    
+    ellipse(this.position.x, this.position.y, this.radius*2);
+
+    fill(default_fill);
+    stroke(default_stroke);
+    strokeWeight(default_stroke_weight);
     
   }
-  addForce(force){
-    this.addedForce.push(p5.Vector.div(force, this.mass));
+  isMouseInside(){
+    return distanceBetween(createVector(mouseX, mouseY), this.position) <= this.radius; 
   }
-  mouseInside(){
-    return !(distanceBetween(createVector(mouseX, mouseY), this.position) > this.radius/2);
-  }
-  // PROPERTIES
-  
-  // base velocity properties
-  direction(){
-    return this.velocity.normalize();
-  }
+
   speed(){
-    return this.velocity.mag(); // in Pixels per second
+    return this.velocity.mag(); // the scalar speed of the body (pixels per frame)
   }
-  // velocity properties after delta time adjustment
-  trueVelocity(){
-    return p5.Vector.mult(this.velocity, dTime()); 
-  }
-  trueSpeed(){
-    return this.trueVelocity().mag(); // in Pixels per frame
+
+  deltaTimeVelocity(){
+    return p5.Vector.mult(this.velocity, dTime()); // the velocity, adjusted by deltaTime (pixels per second)
   }
   
 }
 
 function setup() {
-  fillbuffer = color(255, 255, 255);
-  strokebuffer = color(255, 255, 255);
-  strokeweightbuffer = 4;
-  trailPoints = 0;
-  createCanvas(windowWidth*6, windowHeight*6);
+  default_fill = color(255, 255, 255);
+  default_stroke = color(255, 255, 255);
+  default_stroke_weight = 4;
+  total_trail_particles = 0;
+  createCanvas(windowWidth*3, windowHeight*3);
   frameRate(FRAMERATE);
   textFont('Courier New');
   textSize(FONTSIZE);
@@ -130,42 +130,42 @@ function setup() {
 
 function draw() {
  
-  fill(fillbuffer);
+  fill(default_fill);
   background(0);
   let i = 1;
   for(let body of bodies) body.update();
   for(let body of bodies) body.render();
-  
-  if(showinfo){
-    noStroke();
-    for(let body of bodies){
-      text('SPEED OF ' + body.name + ': ' + body.speed().toFixed(2) + ' p/s', 20, 20+(i*FONTSIZE));
-      i++;
+   
+  if(show_info_mode){ 
+    noStroke(); 
+    for(let body of bodies){ 
+      text("BODY " + (i.toString().padStart(3, "0")) + "   " + body.speed().toFixed(2).padStart(8, "0") + ' p/s' , 20, 20+(i*FONTSIZE));
+      i++
     }
     text('ELAPSED TIME:' + (millis()/1000).toFixed(0), 20, 20+(i*FONTSIZE));
     i++;
     text('FPS: ' + (dTime()**-1).toFixed(0), 20, 20+(i*FONTSIZE));
     i++;
-    if(showtrails){
-      text('TRAIL POINTS: ' + trailPoints, 20, 20+(i*FONTSIZE));
+    if(show_trail_mode){
+      text('TRAIL POINTS: ' + total_trail_particles, 20, 20+(i*FONTSIZE));
       i++;
     }
-    stroke(strokebuffer);
-    strokeWeight(strokeweightbuffer);
+    stroke(default_stroke);
+    strokeWeight(default_stroke_weight);
   }
-  if(creatingBody){
-    diameter += deltaTime/4;
+  if(body_being_generated){
+    radius += deltaTime/4;
     fill(colour);
 
-    ellipse(mouseX, mouseY, diameter/2);
-    fill(fillbuffer);
+    ellipse(mouseX, mouseY, radius*2);
+    fill(default_fill);
   }
-  if(selected){
+  if(body_is_selected){
     stroke(255, 0, 0);
     strokeWeight(4);
-    line(bodyActedUpon.position.x, bodyActedUpon.position.y, mouseX, mouseY);
-    stroke(strokebuffer);
-    strokeWeight(strokeweightbuffer);
+    line(selected_body.position.x, selected_body.position.y, mouseX, mouseY);
+    stroke(default_stroke);
+    strokeWeight(default_stroke_weight);
   }
 }
 function drawArrow(base, vec, col, min, mincutoff = false) {
@@ -188,55 +188,53 @@ function drawArrow(base, vec, col, min, mincutoff = false) {
   translate(arrowVec.mag() - arrowSize, 0);
   triangle(0, arrowSize / 2, 0, -arrowSize / 2, arrowSize, 0);
   pop();
-  fill(fillbuffer);
-  stroke(strokebuffer);
-  strokeWeight(strokeweightbuffer);
+  fill(default_fill);
+  stroke(default_stroke);
+  strokeWeight(default_stroke_weight);
 }
 
 function keyPressed(){
-  if(keyCode == 72) showinfo = !showinfo;
-  if(keyCode == 84) showtrails = !showtrails;
+  if(keyCode == 72) show_info_mode = !show_info_mode;
+  if(keyCode == 84) show_trail_mode = !show_trail_mode;
 }
 
-var diameter;
-var colour;
-var bodyActedUpon;
-var selected;
-var deleted;
+var body_radius;
+var body_colour;
+var selected_body;
+var body_is_selected;
+var body_being_deleted;
+
 function mousePressed(){
-  selected = false;
-  deleted = false;
+  body_is_selected = false;
+  body_being_deleted = false;
 
   for(let body of bodies){
-    if(body.mouseInside()){
+    if(body.isMouseInside()){
       if(mouseButton == RIGHT){
-        trailPoints -= body.trail.length;
+        total_trail_particles -= body.trail.length;
         bodies.splice(bodies.indexOf(body), 1);
-        deleted = true;
+        body_being_deleted = true;
         break;
       }else if(mouseButton == LEFT){
-        bodyActedUpon = body;
-        original = body.position.copy();
+        selected_body = body;
+        original_body_position = body.position.copy();
       }
-      selected = true;
+      body_is_selected = true;
       break;
     }
   }
-  if(!creatingBody && mouseButton == LEFT){
-    creatingBody = !selected;
-    diameter = 0;
-    colour = color(random(0, 255), random(0, 255), random(255));
+  if(!body_being_generated && mouseButton == LEFT){ 
+    body_being_generated = !body_is_selected;
+    radius = 0;
+    colour = color(random(50, 255), random(50, 255), random(255));
   }
   
 }
 function mouseReleased(){
-  creatingBody = false;
   
-  if(!selected && mouseButton == LEFT && !deleted) new Body(createVector(mouseX, mouseY), (diameter**2+15  )*9000000000, diameter, createVector(0,0), colour, "CLICKED");
-  else if(!deleted && mouseButton == LEFT){
-    let dist = p5.Vector.mult(p5.Vector.sub(bodyActedUpon.position, createVector(mouseX, mouseY)));
-    bodyActedUpon.addForce(p5.Vector.mult(dist, bodyActedUpon.mass/2));
-  }
-  selected = false;
-  deleted = false;
+  if(body_being_generated) new Body(createVector(mouseX, mouseY), (radius**2+15)*90000000000, radius, createVector(0,0), colour, "CREATED");
+  else if(!body_being_deleted && mouseButton == LEFT) selected_body.apply_force(p5.Vector.mult(p5.Vector.sub(selected_body.position, createVector(mouseX, mouseY)), selected_body.mass/2));
+  body_being_generated = false;
+  body_is_selected = false;
+  body_being_body_being_deleted = false;
 }
